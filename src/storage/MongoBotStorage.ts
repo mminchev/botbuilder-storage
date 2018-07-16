@@ -92,11 +92,11 @@ export class MongoBotStorage implements IBotStorage {
                     if (err) {
                         return reject(err);
                     }
-                    const docData = doc && doc.data || "{}";
+                    const docData = doc && doc.data || {};
                     const hash = doc && doc.hash;
                     const hashKey: string = type + "Hash";
 
-                    data[type] = JSON.parse(docData);
+                    data[type] = docData;
                     data[hashKey] = hash;
 
                     resolve();
@@ -128,8 +128,8 @@ export class MongoBotStorage implements IBotStorage {
         // Checks if a write operation is required by comparing hashes.
         // Only write to the database if the data has changed.
         let addWrite = (type: BotStateType, id: string, state: BotState, prevHash: string) => {
-            state = JSON.stringify(state || {});
-            const hash = createHash("sha256").update(state);
+            const stateAsString = JSON.stringify(state || {});
+            const hash = createHash("sha256").update(stateAsString);
             const newHash = hash.digest("hex");
 
             if (newHash !== prevHash) {
